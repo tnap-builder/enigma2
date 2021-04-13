@@ -4,6 +4,10 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 datarootdir=@datarootdir@
 
+if [ -x @bindir@/exteplayer3 ] && [ -f @datadir@/bootlogo.mp4 ]; then
+	@bindir@/exteplayer3 @datadir@/bootlogo.mp4
+fi
+
 if [ -d /home/root ]; then
 	export HOME=/home/root
 	cd
@@ -21,15 +25,8 @@ LIBS=@libdir@/libopen.so.0.0.0
 # enigma main loop
 while : ; do
 	# show bootlogo on enigma2 start
-	if [ -x @bindir@/showiframe ]; then
-		if [ -f @sysconfdir@/enigma2/backdrop.mvi ]; then
-			@bindir@/showiframe @sysconfdir@/enigma2/backdrop.mvi
-		elif [ -f @sysconfdir@/enigma2/bootlogo.mvi ]; then
-			@bindir@/showiframe @sysconfdir@/enigma2/bootlogo.mvi
-		elif [ -f @datadir@/bootlogo.mvi ]; then
-			@bindir@/showiframe @datadir@/bootlogo.mvi
-		fi
-	fi
+	@bindir@/showiframe @datadir@/backdrop.mvi	
+
 
 	# hook to execute scripts always before enigma2 start
 	if [ -x @bindir@/enigma2_pre_start.sh ]; then
@@ -37,6 +34,7 @@ while : ; do
 	fi
 
 	# start enigma
+	/usr/sbin/ntpdate -s -u pool.ntp.org
 	sync
 	if [ $DEBUG_LVL -lt 4 ]; then
 		LD_PRELOAD=$LIBS ENIGMA_DEBUG_LVL=$DEBUG_LVL @bindir@/enigma2
@@ -141,4 +139,7 @@ while : ; do
 			;;
 	esac
 
+
+
 done
+
