@@ -83,7 +83,7 @@ class UpdatePlugin(Screen, ProtectedScreen):
 		message = None
 		abort = False
 		picon = MessageBox.TYPE_ERROR
-		url = "https://openpli.org/trafficlight"
+		url = "http://162.216.113.217/PLi_mio_5.5/osmio4kplus/"
 
 		# try to fetch the trafficlight json from the website
 		try:
@@ -129,9 +129,9 @@ class UpdatePlugin(Screen, ProtectedScreen):
 				print "[SoftwareUpdate] status error: ", str(e)
 				message =  _("The current image might not be stable.\nFor more information see %s.") % ("openpli.org")
 
-		# or display a generic warning if fetching failed
-		else:
-			message = _("The status of the current image could not be checked because %s can not be reached.") % ("openpli.org")
+#		# or display a generic warning if fetching failed
+#		else:
+#			message = _("The status of the current image could not be checked because %s can not be reached.") % ("openpli.org")
 
 		# show the user the message first
 		if message is not None:

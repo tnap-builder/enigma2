@@ -2,6 +2,8 @@ from Screens.MessageBox import MessageBox
 from Screens.ParentalControlSetup import ProtectedScreen
 from Screens.Standby import TryQuitMainloop, QUIT_MANUFACTURER_RESET
 from Components.config import config
+from os import system, _exit
+import shutil
 
 class FactoryReset(MessageBox, ProtectedScreen):
 	def __init__(self, session):
@@ -18,8 +20,12 @@ class FactoryReset(MessageBox, ProtectedScreen):
 			(not config.ParentalControl.config_sections.main_menu.value and not config.ParentalControl.config_sections.configuration.value  or hasattr(self.session, 'infobar') and self.session.infobar is None) and\
 			config.ParentalControl.config_sections.manufacturer_reset.value
 
+
 	def close(self, value):
 		if value:
+			system("cp /usr/share/logo/settings /etc/enigma2")
+			exit(0)
+#			shutil.copy('/usr/share/logo/settings', '/etc/enigma2/')
 			open('/etc/.doNotAutoinstall', 'w')
 			self.session.open(TryQuitMainloop, QUIT_MANUFACTURER_RESET)
 		else:
