@@ -3,7 +3,7 @@
 <!-- main-->
 	<screen name="InfoBarSummary" position="0,0" size="1,1">
 		<widget source="session.CurrentService" render="Label" position="0,0" size="1,1">
-			<convert type="VfdDisplay">Number</convert>
+			<convert type="VfdDisplay"></convert>
 		</widget>
 		<widget source="session.RecordState" render="Label" text="REC" position="0,0" size="1,1">
 			<convert type="ConditionalShowHide">Blink,3000,1000</convert>
