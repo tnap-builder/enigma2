@@ -344,6 +344,10 @@ class SecConfigure:
 					sec.setLNBLOFL(5150000)
 					sec.setLNBLOFH(5150000)
 					sec.setLNBThreshold(5150000)
+				elif currLnb.lof.value == "c_band_5750":
+					sec.setLNBLOFL(5750000)
+					sec.setLNBLOFH(5750000)
+					sec.setLNBThreshold(5750000)					
 				elif currLnb.lof.value == "user_defined":
 					sec.setLNBLOFL(currLnb.lofl.value * 1000)
 					sec.setLNBLOFH(currLnb.lofh.value * 1000)
@@ -678,12 +682,6 @@ class NIM(object):
 			return "%s-%s: %s" % (self.slot_name, self.getSlotID(self.slot + 1), self.getFullDescription())
 		return self.getFriendlyFullDescription()
 
-	def isFBCLinkEnabled(self):
-		return self.isFBCLink() and (config.Nims[(self.slot >> 3 << 3)].configMode.value != "nothing" or self.getType() != "DVB-C" and config.Nims[(self.slot >> 3 << 3) + 1].configMode.value != "nothing")
-
-	def isEnabled(self):
-		return self.config_mode != "nothing" or self.isFBCLinkEnabled() or self.internally_connectable is not None and config.Nims[self.internally_connectable].configMode.value != "nothing"
-
 	slot_id = property(getSlotID)
 	slot_name = property(getSlotName)
 	friendly_full_description = property(getFriendlyFullDescription)
@@ -692,7 +690,6 @@ class NIM(object):
 	config_mode = property(lambda self: config.Nims[self.slot].configMode.value)
 	config = property(lambda self: config.Nims[self.slot])
 	empty = property(lambda self: self.getType() is None)
-	enabled = property(isEnabled)
 
 class NimManager:
 	def getConfiguredSats(self):
@@ -985,11 +982,11 @@ class NimManager:
 		nimList = self.getNimListOfType(type, slotid)
 		for nim in nimList[:]:
 			mode = self.getNimConfig(nim)
-			if self.nim_slots[nim].isFBCLink() or mode.configMode.value in ("loopthrough", "satposdepends", "equal"):
+			if self.nim_slots[nim].isFBCLink() or mode.configMode.value == "loopthrough" or mode.configMode.value == "satposdepends":
 				nimList.remove(nim)
 		return nimList
 
-	def canDependOn(self, slotid, advanced_satposdepends=""):
+	def canDependOn(self, slotid, advanced_satposdepends=False):
 		type = self.getNimType(slotid)
 		type = type[:5] # DVB-S2X --> DVB-S, DVB-S2 --> DVB-S, DVB-T2 --> DVB-T, DVB-C2 --> DVB-C
 		nimList = self.getNimListOfType(type, slotid)
@@ -1012,8 +1009,7 @@ class NimManager:
 							break
 			if nimHaveRotor:
 				if advanced_satposdepends:
-					if advanced_satposdepends == "all" or self.nim_slots[nim].isFBCRoot():
-						positionerList.append(nim)
+					positionerList.append(nim)
 				else:
 					alreadyConnected = False
 					for testnim in nimList:
@@ -1216,10 +1212,10 @@ def InitNimManager(nimmgr, update_slots = []):
 			config.Nims.append(ConfigSubsection())
 
 	lnb_choices = {
-		"universal_lnb": _("Universal LNB"),
-		"unicable": _("SCR (Unicable/JESS)"),
-		"c_band": _("C-Band"),
-		"circular_lnb": _("Circular LNB"),
+		"universal_lnb": _("KU UNV 9750/10600"),
+		"c_band": _("C-band 5150"),
+		"c_band_5750": _("C-band 5750"),
+		"circular_lnb": _("KU STD 10750"),
 		"ka_sat": _("KA-SAT"),
 		"user_defined": _("User defined")}
 

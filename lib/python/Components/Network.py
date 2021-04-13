@@ -5,6 +5,7 @@ from socket import *
 from Components.Console import Console
 from Components.PluginComponent import plugins
 from Plugins.Plugin import PluginDescriptor
+import urllib2
 
 class Network:
 	def __init__(self):
@@ -381,9 +382,15 @@ class Network:
 
 	def checkNetworkState(self,statecallback):
 		self.NetworkState = 0
+		try:
+			response=urllib2.urlopen('http://www.google.com',timeout=10)
+			self.NetworkState = -1
+			print"---386--Network.py--Connected to the Internet"
+		except urllib2.URLError as err:
+			print"---388--Network.py--NOT Connected to the Internet"
 		self.pingConsole = Console()
-		for server in ("www.openpli.org", "www.google.nl", "www.google.com"):
-			self.pingConsole.ePopen(("/bin/ping", "/bin/ping", "-c", "1", server), self.checkNetworkStateFinished,statecallback)
+		self.pingConsole.ePopen(("/bin/ping", "-c", "1"), self.checkNetworkStateFinished,statecallback)
+			
 
 	def checkNetworkStateFinished(self, result, retval,extra_args):
 		(statecallback) = extra_args
