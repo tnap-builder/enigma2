@@ -1363,6 +1363,33 @@ class ChannelSelectionBase(Screen):
 				"9": self.keyNumberGlobal,
 				"0": self.keyNumber0
 			}, -2)
+		if config.usage.show_New_folders.value == True: #config.usage.show_New_folders=true
+		    self["ChannelSelectBaseActions"] = NumberActionMap(["ChannelSelectBaseActions", "NumberActions", "InputAsciiActions"],
+			    {
+				    "showFavourites": self.showFavourites,
+				    "showAllServices": self.showAllServices,
+				    "showProviders": self.showProviders,
+				    "showSatellites": boundFunction(self.showSatellites, changeMode=True),
+				    "nextBouquet": self.nextBouquet,
+				    "prevBouquet": self.prevBouquet,
+				    "nextMarker": self.nextMarker,
+				    "prevMarker": self.prevMarker,
+				    "gotAsciiCode": self.keyAsciiCode,
+				    "keyLeft": self.keyLeft,
+				    "keyRight": self.keyRight,
+				    "keyRecord": self.keyRecord,
+				    "toggleTwoLines": self.toggleTwoLines,
+				    "1": self.keyNumberGlobal,
+				    "2": self.keyNumberGlobal,
+				    "3": self.keyNumberGlobal,
+				    "4": self.keyNumberGlobal,
+				    "5": self.keyNumberGlobal,
+				    "6": self.keyNumberGlobal,
+				    "7": self.keyNumberGlobal,
+				    "8": self.keyNumberGlobal,
+				    "9": self.keyNumberGlobal,
+				    "0": self.keyNumber0
+			    }, -2)
 		self.maintitle = _("Channel selection")
 		self.recallBouquetMode()
 
@@ -1543,6 +1570,18 @@ class ChannelSelectionBase(Screen):
 					if playingref:
 						self.setCurrentSelectionAlternative(playingref)
 
+	def getServicesCount(self, root_ref):
+		count = 0
+		serviceHandler = eServiceCenter.getInstance()
+		list = serviceHandler.list(root_ref)
+		if list is not None:
+			while True:
+				s = list.getNext()
+				if not s.valid(): break
+				count += 1
+		return count
+
+
 	def showSatellites(self, changeMode=False):
 		if not self.pathChangeDisabled:
 			refstr = '%s FROM SATELLITES ORDER BY satellitePosition'%(self.service_types)
@@ -1581,9 +1620,14 @@ class ChannelSelectionBase(Screen):
 								orbpos += 3600
 							if "FROM PROVIDER" in service.getPath():
 								service_type = self.showSatDetails and _("Providers")
-							elif ("flags == %d" %(FLAG_SERVICE_NEW_FOUND)) in service.getPath():
-								service_type = self.showSatDetails and _("New")
+							elif ("flags == %d" % (FLAG_SERVICE_NEW_FOUND)) in service.getPath():
+								service_type = self.showSatDetails
+								if service_type == self.showSatDetails:
+								    cnt = self.getServicesCount(service)
+								    if cnt is not 0:
+								        service_type = self.showSatDetails and _("New")
 							else:
+								cnt1 = self.getServicesCount(service)
 								service_type = _("Services")
 								if orbpos ==2571 and self.mode ==MODE_TV:
 								    service_type = ()
@@ -1604,8 +1648,18 @@ class ChannelSelectionBase(Screen):
 										else:
 											h = _("E")
 										service_name = ("%d.%d" + h) % (orbpos / 10, orbpos % 10)
-									service.setName("%s" % (service_name))
-									self.servicelist.addService(service)
+
+
+									if service_type == "Services":
+										if config.usage.show_New_folders.value == True:
+										    cntstr = " (%d)"%(self.getServicesCount(service))
+										    service.setName("%s  -- %s" % (service_name, cntstr))
+										else:
+										    service.setName("%s " % (service_name))
+										self.servicelist.addService(service)
+									if service_type == "New" and config.usage.show_New_folders.value == True:
+										service.setName("%s New = %d" % (service_name, cnt ))
+										self.servicelist.addService(service)
 						cur_ref = self.session.nav.getCurrentlyPlayingServiceReference()
 						self.servicelist.l.sort()
 						if cur_ref:
@@ -1622,6 +1676,7 @@ class ChannelSelectionBase(Screen):
 							ref = eServiceReference(service_ref)
 							ref.setName(service_name)
 							self.servicelist.addService(ref, beforeCurrent=True)
+							break
 						self.servicelist.l.FillFinished()
 						if prev is not None:
 							self.setCurrentSelection(prev)
