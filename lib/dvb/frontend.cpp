@@ -628,7 +628,7 @@ int eDVBFrontend::openFrontend()
 		{
 			if (::ioctl(m_fd, FE_GET_INFO, &fe_info) < 0)
 			{
-				eWarning("[eDVBFrontend] ioctl FE_GET_INFO failed");
+				eWarning("[eDVB-#631-Frontend] ioctl FE_GET_INFO failed");
 				::close(m_fd);
 				m_fd = -1;
 				return -1;
@@ -853,9 +853,11 @@ void eDVBFrontend::feEvent(int w)
 		if (event.status & FE_HAS_LOCK)
 		{
 			state = stateLock;
+			eDebug("[eDVB-#856-Frontend%d] fe event: Has Lock!!!", m_dvbid);
 		}
 		else
 		{
+			eDebug("[eDVB-#860-Frontend%d] fe event: Not Locked!!!", m_dvbid);
 			if (m_tuning) {
 				state = stateTuning;
 				if (event.status & FE_TIMEDOUT) {
@@ -1195,7 +1197,7 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 		switch (parm.system)
 		{
 			case eDVBFrontendParametersTerrestrial::System_DVB_T:
-			case eDVBFrontendParametersTerrestrial::System_DVB_T2: 
+			case eDVBFrontendParametersTerrestrial::System_DVB_T2:
 			case eDVBFrontendParametersTerrestrial::System_DVB_T_T2: ret = (int)(snr / 58); ter_max = 1700; break;
 			default: break;
 		}
@@ -1250,7 +1252,7 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 				break;
 		}
 	}
-	else if (!strcmp(m_description, "GIGA DVB-T2/C NIM (TT3L10)")) // dual plug & play tuner GB UE/Quad UHD 4K 
+	else if (!strcmp(m_description, "GIGA DVB-T2/C NIM (TT3L10)")) // dual plug & play tuner GB UE/Quad UHD 4K
 	{
 		ret = (int)(snr / 15);
 	}
@@ -1274,7 +1276,7 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 		ret = (int)(snr / 46.8);
 		sat_max = 1620;
 	}
-	else if(!strcmp(m_description, "WinTV HVR-850") || !strcmp(m_description, "Hauppauge") || !strcmp(m_description, "LG Electronics LGDT3306A VSB/QAM Frontend"))
+	else if(!strcmp(m_description, "WinTV HVR-850") || !strcmp(m_description, "Hauppauge") || !strcmp(m_description, "WinTV HVR-950") || !strcmp(m_description, "LG Electronics LGDT3306A VSB/QAM Frontend"))
 	{
 		eDVBFrontendParametersATSC parm{};
 		oparm.getATSC(parm);
@@ -1363,7 +1365,7 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 	{
 		ret = snr;
 	}
-	
+
 	signalqualitydb = ret;
 	if (ret == 0x12345678) // no snr db calculation avail.. return untouched snr value..
 	{
@@ -1395,6 +1397,8 @@ int eDVBFrontend::readFrontendData(int type)
 {
 	char force_legacy_signal_stats[64] = {};
 	sprintf(force_legacy_signal_stats, "config.Nims.%d.force_legacy_signal_stats", m_slotid);
+	char show_signal_below_lock[64] = {};
+	sprintf(show_signal_below_lock, "config.Nims.%d.show_signal_below_lock", m_slotid);
 
 	switch(type)
 	{
@@ -1421,6 +1425,17 @@ int eDVBFrontend::readFrontendData(int type)
 				}
 				return snr;
 			}
+			else if (eConfigManager::getConfigBoolValue(show_signal_below_lock, true))
+			{
+				uint16_t snr = 0;
+				if (!m_simulate)
+				{
+					if (ioctl(m_fd, FE_READ_SNR, &snr) < 0 && errno != ERANGE)
+						eDebug("[eDVBFrontend] FE_READ_SNR failed: %m");
+				}
+				if (snr < 15536)
+					return snr;
+			}
 			break;
 		case iFrontendInformation_ENUMS::signalQuality:
 		case iFrontendInformation_ENUMS::signalQualitydB: /* this moved into the driver on DVB API 5.10 */
@@ -1429,7 +1444,7 @@ int eDVBFrontend::readFrontendData(int type)
 				int signalquality = 0;
 				int signalqualitydb = 0;
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 10
-				if (m_dvbversion >= DVB_VERSION(5, 10) && !eConfigManager::getConfigBoolValue(force_legacy_signal_stats, false))
+				if (m_dvbversion >= DVB_VERSION(5, 10))
 				{
 					dtv_property prop[1] = {};
 					prop[0].cmd = DTV_STAT_CNR;
@@ -1483,6 +1498,81 @@ int eDVBFrontend::readFrontendData(int type)
 					return signalqualitydb;
 				}
 			}
+			else if (eConfigManager::getConfigBoolValue(show_signal_below_lock, true))
+			{
+				int signalquality = 0;
+				int signalqualitydb = 0;
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 10
+				if (m_dvbversion >= DVB_VERSION(5, 10))
+				{
+					dtv_property prop[1] = {};
+					prop[0].cmd = DTV_STAT_CNR;
+					dtv_properties props;
+					props.props = prop;
+					props.num = 1;
+
+					if (::ioctl(m_fd, FE_GET_PROPERTY, &props) < 0 && errno != ERANGE)
+					{
+						eDebug("[eDVBFrontend] DTV_STAT_CNR failed: %m");
+					}
+					else
+					{
+						for(unsigned int i=0; i<prop[0].u.st.len; i++)
+						{
+							if (prop[0].u.st.stat[i].scale == FE_SCALE_DECIBEL)
+							{
+								signalqualitydb = prop[0].u.st.stat[i].svalue / 10;
+							}
+							else if (prop[0].u.st.stat[i].scale == FE_SCALE_RELATIVE)
+							{
+								signalquality = prop[0].u.st.stat[i].svalue;
+							}
+						}
+						if (signalqualitydb)
+						{
+							if(type == iFrontendInformation_ENUMS::signalQualitydB)
+							{
+								return signalqualitydb;
+							}
+							if(!signalquality)
+							{
+								/* provide an estimated percentage when drivers lack this info */
+								signalquality = calculateSignalPercentage(signalqualitydb);
+							}
+							return signalquality;
+			                if (m_state != stateLock)
+			                {
+				                uint16_t snr = 0;
+				                int signalquality = 0;
+				                int signalqualitydb = 0;
+				                if (!m_simulate)
+					                ioctl(m_fd, FE_READ_SNR, &snr);
+				                if (snr > 0 && snr < 65535)
+				                {
+					                calculateSignalQuality(snr, signalquality, signalqualitydb);
+					                if (type == iFrontendInformation_ENUMS::signalQuality)
+						                return signalquality;
+					                else
+						                return signalqualitydb;
+				                }
+			                }
+						}
+					}
+				}
+#endif
+				/* fallback to old DVB API */
+				int snr = readFrontendData(iFrontendInformation_ENUMS::snrValue);
+				calculateSignalQuality(snr, signalquality, signalqualitydb);
+
+				if (type == iFrontendInformation_ENUMS::signalQuality)
+				{
+					return signalquality;
+				}
+				else
+				{
+					return signalqualitydb;
+				}
+			}
 			break;
 		case iFrontendInformation_ENUMS::signalPower:
 			if (m_state == stateLock)
@@ -1491,7 +1581,7 @@ int eDVBFrontend::readFrontendData(int type)
 				if (!m_simulate)
 				{
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 10
-					if (m_dvbversion >= DVB_VERSION(5, 10) && !eConfigManager::getConfigBoolValue(force_legacy_signal_stats, false))
+					if (m_dvbversion >= DVB_VERSION(5, 10))
 					{
 						dtv_property prop[1] = {};
 						prop[0].cmd = DTV_STAT_SIGNAL_STRENGTH;
@@ -1810,7 +1900,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				eDebugNoSimulateNoNewLineStart("[eDVBFrontend%d] sendDiseqc: ", m_dvbid);
 				for (int i=0; i < m_sec_sequence.current()->diseqc.len; ++i)
 				    eDebugNoNewLine("%02x", m_sec_sequence.current()->diseqc.data[i]);
- 
+
 			 	if (!memcmp(m_sec_sequence.current()->diseqc.data, "\xE0\x00\x00", 3))
 					eDebugNoNewLine("(DiSEqC reset)\n");
 				else if (!memcmp(m_sec_sequence.current()->diseqc.data, "\xE0\x00\x03", 3))
@@ -1832,7 +1922,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				int tuneTimeout = m_sec_sequence.current()->timeout;
+				int tuneTimeout = (m_sec_sequence.current()->timeout)-2000;
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
@@ -1840,7 +1930,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				break;
 			}
 			case eSecCommand::SET_TIMEOUT:
-				m_timeoutCount = m_sec_sequence.current()++->val;
+				m_timeoutCount = (m_sec_sequence.current()++->val) - 1000;
 				eDebugNoSimulate("[eDVBFrontend%d] set timeout %d", m_dvbid, m_timeoutCount);
 				break;
 			case eSecCommand::IF_TIMEOUT_GOTO:
@@ -2586,7 +2676,7 @@ RESULT eDVBFrontend::tune(const iDVBFrontendParameters &where, bool blindscan)
 	if (m_blindscan)
 	{
 		/* blindscan iterations can take a long time, use a long timeout */
-		timeout = 60000;
+		timeout = 20000;
 	}
 	else
 	{
