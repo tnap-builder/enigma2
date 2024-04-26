@@ -25,17 +25,22 @@ import glob
 API_GITHUB = 0
 API_GITLAB = 1
 
-
 class About(Screen):
 	def __init__(self, session):
+		s = 0
+		try:
+		    s = os.path.getsize('/lib/modules/5.15.0/extra/avl6261.ko')
+		except: 
+		    pass
 		Screen.__init__(self, session)
 		self.setTitle(_("About"))
 		hddsplit = parameters.get("AboutHddSplit", 1)
 
-		AboutText = _("Hardware: ") + about.getHardwareTypeString() + "\n"
+		AboutText = "\n" + _("Help & Image Download: ") +"https://legitfta.com/forum/" + "\n\n"
+		AboutText += _("Hardware: ") + about.getHardwareTypeString() + "\n"
 		cpu = about.getCPUInfoString()
 		AboutText += _("CPU: ") + cpu + "\n"
-		AboutText += _("Image: ") + about.getImageTypeString() + "\n"
+		AboutText += _("Image: ") + about.getImageTypeString() + " -- Based On OpenPLi \n"
 		AboutText += _("Build date: ") + about.getBuildDateString() + "\n"
 		AboutText += _("Last update: ") + about.getUpdateDateString() + "\n"
 
@@ -55,6 +60,8 @@ class About(Screen):
 		AboutText += _("Kernel version: ") + about.getKernelVersionString() + "\n"
 
 		AboutText += _("DVB driver version: ") + about.getDriverInstalledDate() + "\n"
+		if s > 90000:
+			AboutText += _("DVB driver version: ") + about.getDriverInstalledDate() + " -- [No-T2MI]\n"
 
 		GStreamerVersion = about.getGStreamerVersionString().replace("GStreamer", "")
 		self["GStreamerVersion"] = StaticText(GStreamerVersion)
@@ -63,17 +70,16 @@ class About(Screen):
 		self["ffmpegVersion"] = StaticText(ffmpegVersion)
 
 		player = None
-
-		if os.path.isfile('/var/lib/opkg/info/enigma2-plugin-systemplugins-servicemp3.list'):
-			if GStreamerVersion:
-				player = _("Media player") + ": Gstreamer, " + _("version") + " " + GStreamerVersion
-		if os.path.isfile('/var/lib/opkg/info/enigma2-plugin-systemplugins-servicehisilicon.list'):
+		if cpu.upper().startswith('HI') or os.path.isdir('/proc/hisi'):
 			if os.path.isdir("/usr/lib/hisilicon") and glob.glob("/usr/lib/hisilicon/libavcodec.so.*"):
 				player = _("Media player") + ": ffmpeg, " + _("Hardware Accelerated")
 			elif ffmpegVersion and ffmpegVersion[0].isdigit():
 				player = _("Media player") + ": ffmpeg, " + _("version") + " " + ffmpegVersion
 
 		if player is None:
+			if GStreamerVersion:
+				player = _("Media player") + ": Gstreamer, " + _("version") + " " + GStreamerVersion
+			else:
 				player = _("Media player") + ": " + _("Not Installed")
 
 		AboutText += player + "\n"
@@ -85,7 +91,9 @@ class About(Screen):
 		AboutText += _("Enigma debug level: %d\n") % eGetEnigmaDebugLvl()
 
 		fp_version = getFPVersion()
-		if fp_version != None and fp_version not in (0, "0"):
+		if fp_version is None:
+			fp_version = ""
+		elif fp_version != 0:
 			fp_version = _("Frontprocessor version: %s") % fp_version
 			AboutText += fp_version + "\n"
 
