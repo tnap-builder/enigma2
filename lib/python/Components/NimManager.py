@@ -1,6 +1,7 @@
 import os
 
 from Components.SystemInfo import SystemInfo
+from Tools.HardwareInfo import HardwareInfo
 from Tools.BoundFunction import boundFunction
 
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigFloat, ConfigSatlist, ConfigYesNo, ConfigInteger, ConfigSubList, ConfigNothing, ConfigSubDict, ConfigOnOff, ConfigDateTime, ConfigText
@@ -14,6 +15,9 @@ from itertools import chain
 import xml.etree.ElementTree
 
 config.unicable = ConfigSubsection()
+
+def orbStr(pos):
+	return pos > 3600 and "N/A" or "%d.%d\xc2\xb0%s" % (pos > 1800 and ((3600 - pos) / 10, (3600 - pos) % 10, "W") or (pos / 10, pos % 10, "E"))
 
 
 def getConfigSatlist(orbpos, satlist):
@@ -382,6 +386,10 @@ class SecConfigure:
 					sec.setLNBLOFL(5150000)
 					sec.setLNBLOFH(5150000)
 					sec.setLNBThreshold(5150000)
+				elif currLnb.lof.value == "c_band_5750":
+					sec.setLNBLOFL(5750000)
+					sec.setLNBLOFH(5750000)
+					sec.setLNBThreshold(5750000)					
 				elif currLnb.lof.value == "user_defined":
 					sec.setLNBLOFL(currLnb.lofl.value * 1000)
 					sec.setLNBLOFH(currLnb.lofh.value * 1000)
@@ -394,6 +402,10 @@ class SecConfigure:
 					sec.setLNBLOFL(21200000)
 					sec.setLNBLOFH(21200000)
 					sec.setLNBThreshold(21200000)
+				elif currLnb.lof.value == "ka_sat_20357":
+					sec.setLNBLOFL(20357000)
+					sec.setLNBLOFH(20357000)
+					sec.setLNBThreshold(20357000)
 
 				if currLnb.increased_voltage.value:
 					sec.setLNBIncreasedVoltage(True)
@@ -575,7 +587,7 @@ class NIM:
 				types.remove("DVB-S")
 			if len(types) > 1:
 				self.multi_type = {}
-				self.combined = not (os.path.exists("/proc/stb/frontend/%d/mode" % self.frontend_id) or self.isFBCTuner())
+				self.combined = not(os.path.exists("/proc/stb/frontend/%d/mode" % self.frontend_id) or self.isFBCTuner())
 				for type in types:
 					self.multi_type[str(types.index(type))] = type
 
@@ -1310,6 +1322,8 @@ def InitSecParams():
 
 
 def InitNimManager(nimmgr, update_slots=[]):
+	hw = HardwareInfo()
+
 	if not hasattr(config, "Nims"):
 		InitSecParams()
 		config.Nims = ConfigSubList()
@@ -1317,11 +1331,12 @@ def InitNimManager(nimmgr, update_slots=[]):
 			config.Nims.append(ConfigSubsection())
 
 	lnb_choices = {
-		"universal_lnb": _("Universal LNB"),
-		"unicable": _("SCR (Unicable/JESS)"),
-		"c_band": _("C-Band"),
-		"circular_lnb": _("Circular LNB"),
+		"circular_lnb": _("KU STD 10750"),
+		"universal_lnb": _("KU UNV 9750/10600"),
+		"c_band": _("C-band 5150"),
+		"c_band_5750": _("C-band 5750"),
 		"ka_sat": _("KA-SAT"),
+		"ka_sat_20357": _("KA-SAT-20357MHz"),
 		"user_defined": _("User defined")}
 
 	lnb_choices_default = "universal_lnb"
@@ -1771,6 +1786,7 @@ def InitNimManager(nimmgr, update_slots=[]):
 			continue
 		nim = config.Nims[slot_id]
 		nim.force_legacy_signal_stats = ConfigYesNo(default=False)
+		nim.show_signal_below_lock = ConfigYesNo(default=False)
 
 		if slot.isCombined():
 			nim.configModeDVBS = ConfigYesNo()
