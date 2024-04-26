@@ -1,5 +1,9 @@
 #!/bin/sh
 
+BOOTLOGO=/usr/share/bootlogo.mvi
+[ -f /etc/enigma2/bootlogo.mvi ] && BOOTLOGO=/etc/enigma2/bootlogo.mvi
+/usr/bin/showiframe ${BOOTLOGO}
+
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 datarootdir=@datarootdir@
@@ -8,6 +12,10 @@ if [ -d /home/root ]; then
 	export HOME=/home/root
 	cd
 fi
+
+/usr/sbin/ntpdate -s -u pool.ntp.org
+hwclock --systohc || :
+echo "enigma2.sh is updating Hardware Clock"
 
 # any debuglevel passed?
 if [ -z $ENIGMA_DEBUG_LVL ]; then
@@ -27,12 +35,8 @@ LIBS=@libdir@/libopen.so.0.0.0
 while : ; do
 	# show bootlogo on enigma2 start
 	if [ -x @bindir@/showiframe ]; then
-		if [ -f @sysconfdir@/enigma2/backdrop.mvi ]; then
-			@bindir@/showiframe @sysconfdir@/enigma2/backdrop.mvi
-		elif [ -f @sysconfdir@/enigma2/bootlogo.mvi ]; then
-			@bindir@/showiframe @sysconfdir@/enigma2/bootlogo.mvi
-		elif [ -f @datadir@/bootlogo.mvi ]; then
-			@bindir@/showiframe @datadir@/bootlogo.mvi
+		if [ -f @datadir@/backdrop.mvi ]; then
+			@bindir@/showiframe @datadir@/backdrop.mvi
 		fi
 	fi
 
