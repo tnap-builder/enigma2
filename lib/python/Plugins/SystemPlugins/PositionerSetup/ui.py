@@ -29,33 +29,6 @@ from threading import Event as Event
 import os  # Extra Import
 from . import log
 from . import rotor_calc
-from Tools.Directories import fileExists #extra import
-
-BOX_MODEL = ""
-BOX_NAME = ""
-if fileExists("/proc/stb/info/boxtype") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/gbmodel"):
-	try:
-		p = 0
-		nimfile = open("/proc/bus/nim_sockets")
-		for line in nimfile:
-			line = line.strip()
-			if line.endswith("AVL62X1"):
-				p = 1
-		l = open("/proc/stb/info/boxtype")
-		model = l.read().strip()
-		l.close()
-		BOX_NAME = str(model.lower())
-		if BOX_NAME.startswith("et"):
-			BOX_MODEL = "xtrend"
-		elif BOX_NAME.startswith("os"):
-			BOX_MODEL = "edision"
-		elif BOX_NAME.startswith("sf"):
-			BOX_MODEL = "octagon"
-			if p == 1:
-				BOX_NAME = "sf8008-Supreme"
-		nimfile.close()
-	except:
-		pass
 
 
 class PositionerSetup(Screen):
@@ -99,7 +72,7 @@ class PositionerSetup(Screen):
 
 	def __init__(self, session, feid):
 		Screen.__init__(self, session)
-		self.setTitle(_("TNAP Positioner Setup - " + BOX_NAME))
+		self.setTitle(_("Positioner Setup for TNAP Images"))
 		self.feid = feid
 		self.oldref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 		self.oldref_stop = False
