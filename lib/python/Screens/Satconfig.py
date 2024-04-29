@@ -315,6 +315,7 @@ class NimSetup(ConfigListScreen, ServiceStopScreen, Screen):
 
 		if self.nimConfig.configMode.value != "nothing" and config.usage.setup_level.index > 1 and not self.nim.isFBCLink():
 			self.list.append((_("Force legacy signal stats"), self.nimConfig.force_legacy_signal_stats, _("If set to 'yes' signal values (SNR, etc) will be calculated from API V3. This is an old API version that has now been superseded.")))
+			self.list.append((_("Allow signal below lock"), self.nimConfig.show_signal_below_lock, _("If set to 'yes' signal values (SNR, etc) will be allowed to go below Lock on supported tuners. Using this setting may cause False signal values to be displayed.")))
 
 		self["config"].list = self.list
 		self.setTextKeyYellow()
@@ -442,7 +443,7 @@ class NimSetup(ConfigListScreen, ServiceStopScreen, Screen):
 					if self.nim.isFBCLink():
 						if not self.nimConfig.advanced.unicableconnected.value:
 							self.nimConfig.advanced.unicableconnected.value = True
-					self.advancedConnected = (self.indent % _("Connected through another tuner"), self.nimConfig.advanced.unicableconnected, _("Select 'yes' if this tuner is connected to the SCR device through another tuner, otherwise select 'no'."))
+					self.advancedConnected = (self.indent % _("Connected"), self.nimConfig.advanced.unicableconnected, _("Select 'yes' if this tuner is connected to the SCR device through another tuner, otherwise select 'no'."))
 					self.list.append(self.advancedConnected)
 					if self.nimConfig.advanced.unicableconnected.value:
 						self.nimConfig.advanced.unicableconnectedTo.setChoices(choices)
