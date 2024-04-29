@@ -1786,7 +1786,6 @@ int eDVBFrontend::readInputpower()
 
 bool eDVBFrontend::setSecSequencePos(int steps)
 {
-	eDebugNoSimulate("[eDVBFrontend%d] set sequence pos %d", m_dvbid, steps);
 	if (!steps)
 		return false;
 	while( steps > 0 )
@@ -1846,7 +1845,6 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 		{
 			case eSecCommand::SLEEP:
 				delay = m_sec_sequence.current()++->msec;
-				eDebugNoSimulate("[eDVBFrontend%d] sleep %dms", m_dvbid, delay);
 				break;
 			case eSecCommand::GOTO:
 				if ( !setSecSequencePos(m_sec_sequence.current()->steps) )
@@ -1922,7 +1920,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				int tuneTimeout = (m_sec_sequence.current()->timeout)-2000;
+				int tuneTimeout = (m_sec_sequence.current()->timeout)-1600;
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
@@ -1930,11 +1928,13 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				break;
 			}
 			case eSecCommand::SET_TIMEOUT:
-				m_timeoutCount = (m_sec_sequence.current()++->val) - 1000;
+				m_timeoutCount = (m_sec_sequence.current()++->val) -1400;
+				if (m_timeoutCount < 0)
+					m_timeoutCount = 0;
 				eDebugNoSimulate("[eDVBFrontend%d] set timeout %d", m_dvbid, m_timeoutCount);
 				break;
 			case eSecCommand::IF_TIMEOUT_GOTO:
-				if (!m_timeoutCount)
+				if (!m_timeoutCount || m_timeoutCount < -40)
 				{
 					eDebugNoSimulate("[eDVBFrontend%d] rotor timout", m_dvbid);
 					setSecSequencePos(m_sec_sequence.current()->steps);
@@ -1989,10 +1989,10 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				if (isLocked && ((abs((signal = readFrontendData(iFrontendInformation_ENUMS::signalQualitydB)) - cmd.lastSignal) < 40) || !cmd.lastSignal))
 				{
 					if (cmd.lastSignal)
-						eDebugNoSimulate("[eDVBFrontend%d] locked step %d ok (%d %d)", m_dvbid, cmd.okcount, signal, cmd.lastSignal);
+						eDebugNoSimulate("[#1992 - eDVBFrontend%d] locked step %d ok (%d %d), timeout count = %d", m_dvbid, cmd.okcount, signal, cmd.lastSignal, m_timeoutCount);
 					else
 					{
-						eDebugNoSimulate("[eDVBFrontend%d] locked step %d ok", m_dvbid, cmd.okcount);
+						eDebugNoSimulate("[#1996 - eDVBFrontend%d] locked step %d ok, timeout count = %d", m_dvbid, cmd.okcount, m_timeoutCount);
 						if (!cmd.okcount)
 							cmd.lastSignal = signal;
 					}
@@ -2011,9 +2011,9 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				else
 				{
 					if (isLocked)
-						eDebugNoSimulate("[eDVBFrontend%d] rotor locked step %d failed (oldSignal %d, curSignal %d)", m_dvbid, cmd.okcount, signal, cmd.lastSignal);
+						eDebugNoSimulate("[#2014 - eDVBFrontend%d] rotor locked step %d failed (oldSignal %d, curSignal %d), timeout count = %d", m_dvbid, cmd.okcount, signal, cmd.lastSignal, m_timeoutCount);
 					else
-						eDebugNoSimulate("[eDVBFrontend%d] rotor locked step %d failed (not locked)", m_dvbid, cmd.okcount);
+						eDebugNoSimulate("[#2016 - eDVBFrontend%d] rotor locked step %d failed (not locked, timeout count = %d", m_dvbid, cmd.okcount, m_timeoutCount);
 					cmd.okcount=0;
 					cmd.lastSignal=0;
 				}
@@ -2035,7 +2035,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 
 						if (event.status & FE_TIMEDOUT)
 						{
-							eDebugNoSimulate("[eDVBFrontend%d] IF_LOCK_TIMEOUT_GOTO: got FE_TIMEDOUT", m_dvbid);
+							eDebugNoSimulate("[eDVBFrontend%d] IF_LOCK_TIMEOUT_GOTO: got FE_TIMEDOUT, timeout count = %d", m_dvbid, m_timeoutCount);
 							setSecSequencePos(m_sec_sequence.current()->steps);
 							timeout = true;
 							break;
@@ -2677,6 +2677,7 @@ RESULT eDVBFrontend::tune(const iDVBFrontendParameters &where, bool blindscan)
 	{
 		/* blindscan iterations can take a long time, use a long timeout */
 		timeout = 20000;
+		eDebug("[eDVBFrontend%d] Blindscan Timeout = %d", m_dvbid, timeout);
 	}
 	else
 	{
