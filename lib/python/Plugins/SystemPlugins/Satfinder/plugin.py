@@ -12,7 +12,6 @@ from Components.TuneTest import Tuner
 from Tools.Transponder import getChannelNumber, channel2frequency
 from Tools.BoundFunction import boundFunction
 from Screens.Screen import Screen # for services found class
-from Tools.Directories import fileExists   # Extra Import
 import os  # Extra Import
 
 
@@ -34,31 +33,6 @@ if dvbreader_available:
 	import datetime
 	import _thread as thread
 
-BOX_MODEL = ""
-BOX_NAME = ""
-if fileExists("/proc/stb/info/boxtype") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/gbmodel"):
-	try:
-		p = 0
-		nimfile = open("/proc/bus/nim_sockets")
-		for line in nimfile:
-			line = line.strip()
-			if line.endswith("AVL62X1"):
-				p = 1
-		l = open("/proc/stb/info/boxtype")
-		model = l.read().strip()
-		l.close()
-		BOX_NAME = str(model.lower())
-		if BOX_NAME.startswith("et"):
-			BOX_MODEL = "xtrend"
-		elif BOX_NAME.startswith("os"):
-			BOX_MODEL = "edision"
-		elif BOX_NAME.startswith("sf"):
-			BOX_MODEL = "octagon"
-			if p == 1:
-				BOX_NAME = "sf8008-Supreme"
-		nimfile.close()
-	except:
-		pass
 
 class Satfinder(ScanSetup, ServiceScan):
 	"""Inherits StaticText [key_red] and [key_green] properties from ScanSetup"""
@@ -91,7 +65,7 @@ class Satfinder(ScanSetup, ServiceScan):
 
 		ScanSetup.__init__(self, session)
 		self.entryChanged = self.newConfig
-		self.setTitle(_("Signal finder") + " for " + BOX_MODEL + " " + BOX_NAME)
+		self.setTitle(_("Signal finder"))
 		self["Frontend"] = FrontendStatus(frontend_source=lambda: self.frontend, update_interval=100)
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions"],
@@ -845,12 +819,9 @@ class SatfinderExtra(Satfinder):
 		return "%0.1f%s" % (abs(op) / 10., "W" if op < 0 else "E")
 
 	def tunerLock(self):
-		try:
-			frontendStatus = {}
-			self.frontend.getFrontendStatus(frontendStatus)
-			return frontendStatus["tuner_state"] == "LOCKED"
-		except:
-			pass
+		frontendStatus = {}
+		self.frontend.getFrontendStatus(frontendStatus)
+		return frontendStatus["tuner_state"] == "LOCKED"
 
 	def waitTunerLock(self, currentProcess):
 		lock_timeout = 120
@@ -859,43 +830,36 @@ class SatfinderExtra(Satfinder):
 		timeout += datetime.timedelta(0, lock_timeout)
 
 		while True:
-			try:
-				if datetime.datetime.now() > timeout:
-				    print ("[Satfinder][waitTunerLock] tuner lock timeout reached, seconds:"), lock_timeout
-				    return False
+			if datetime.datetime.now() > timeout:
+				print ("[Satfinder][waitTunerLock] tuner lock timeout reached, seconds:"), lock_timeout
+				return False
 
-				if self.currentProcess != currentProcess:
-				    return False
+			if self.currentProcess != currentProcess:
+				return False
 
-				frontendStatus = {}
-				self.frontend.getFrontendStatus(frontendStatus)
-				if frontendStatus["tuner_state"] == "FAILED":
-				    print ("[Satfinder][waitTunerLock] TUNING FAILED FATAL") # enigma2 cpp code has given up trying
-				    return False
+			frontendStatus = {}
+			self.frontend.getFrontendStatus(frontendStatus)
+			if frontendStatus["tuner_state"] == "FAILED":
+				print ("[Satfinder][waitTunerLock] TUNING FAILED FATAL") # enigma2 cpp code has given up trying
+				return False
 
-				if frontendStatus["tuner_state"] != "LOCKED":
-				    time.sleep(0.25)
-				    continue
+			if frontendStatus["tuner_state"] != "LOCKED":
+				time.sleep(0.25)
+				continue
 
-				return True
-			except:
-				pass
+			return True
 
 	def monitorTunerLock(self, currentProcess):
 		while True:
-			try:
-				if self.currentProcess != currentProcess:
-				    return
-				frontendStatus = {}
-				self.frontend.getFrontendStatus(frontendStatus)
-				if frontendStatus["tuner_state"] != "LOCKED":
-				    print ("[monitorTunerLock] starting again from scratch")
-				    self.getCurrentTsidOnid(False) # if tuner lock fails start again from beginning
-				    return
-				time.sleep(1.0)
-			except:
-				pass
-
+			if self.currentProcess != currentProcess:
+				return
+			frontendStatus = {}
+			self.frontend.getFrontendStatus(frontendStatus)
+			if frontendStatus["tuner_state"] != "LOCKED":
+				print ("[monitorTunerLock] starting again from scratch")
+				self.getCurrentTsidOnid(False) # if tuner lock fails start again from beginning
+				return
+			time.sleep(1.0)
 
 	def keyReadServices(self):
 		if not self.serviceList:
