@@ -12,26 +12,22 @@ from Components.TuneTest import Tuner
 from Tools.Transponder import getChannelNumber, channel2frequency
 from Tools.BoundFunction import boundFunction
 from Screens.Screen import Screen # for services found class
-import os  # Extra Import
+from skin import parameters
+from Components.Sources.StaticText import StaticText
+from Components.ScrollLabel import ScrollLabel
+from Components.Label import Label
+from Tools.Hex2strColor import Hex2strColor
+from Plugins.SystemPlugins.Satfinder import dvbreader
+import time
+import datetime
+import _thread as thread
+import os  ## Extra Import
 
 
-try: # for reading the current transport stream (SatfinderExtra)
-	from Plugins.SystemPlugins.Satfinder import dvbreader
-	dvbreader_available = True
-	os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 755)
-except ImportError:
-	print("[Satfinder] import dvbreader not available")
-	dvbreader_available = False
 
-if dvbreader_available:
-	from skin import parameters
-	from Components.Sources.StaticText import StaticText
-	from Components.ScrollLabel import ScrollLabel
-	from Components.Label import Label
-	from Tools.Hex2strColor import Hex2strColor
-	import time
-	import datetime
-	import _thread as thread
+os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 444)	
+
+
 
 
 class Satfinder(ScanSetup, ServiceScan):
@@ -114,6 +110,7 @@ class Satfinder(ScanSetup, ServiceScan):
 				self.timer.start(500, True)
 
 	def __onClose(self):
+		os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 444)
 		self.session.nav.playService(self.session.postScanService)
 
 	def newConfig(self):
@@ -568,6 +565,7 @@ class Satfinder(ScanSetup, ServiceScan):
 		self.startScan(tlist, self.feid)
 
 	def startScan(self, tlist, feid):
+		os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 444)
 		flags = 0
 		networkid = 0
 		self.session.openWithCallback(self.startScanCallback, ServiceScan, [{"transponders": tlist, "feid": feid, "flags": flags, "networkid": networkid}])
@@ -577,6 +575,7 @@ class Satfinder(ScanSetup, ServiceScan):
 			self.doCloseRecursive()
 
 	def keyCancel(self):
+		os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 444)
 		if self.session.postScanService and self.frontend:
 			self.frontend = None
 			del self.raw_channel
@@ -608,6 +607,7 @@ class SatfinderExtra(Satfinder):
 		self["tsid"] = StaticText("")
 		self["onid"] = StaticText("")
 		self["pos"] = StaticText("")
+#		os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 755)
 
 	def retune(self, configElement=None):
 		Satfinder.retune(self)
@@ -624,6 +624,7 @@ class SatfinderExtra(Satfinder):
 		Satfinder.prepareFrontend(self)
 
 	def dvb_read_stream(self):
+		os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 755)
 		print ("[satfinder][dvb_read_stream] starting")
 		thread.start_new_thread(self.getCurrentTsidOnid, (True,))
 
@@ -636,7 +637,7 @@ class SatfinderExtra(Satfinder):
 		self["actions2"].setEnabled(False)
 		self.serviceList = []
 
-		if not dvbreader_available or self.frontend is None or self.demux < 0:
+		if self.frontend is None or self.demux < 0:
 			return
 
 		if from_retune: # give the tuner a chance to retune or we will be reading the old stream
@@ -726,7 +727,7 @@ class SatfinderExtra(Satfinder):
 		self.getOrbPosFromNit(currentProcess)
 
 	def getOrbPosFromNit(self, currentProcess):
-		if self.DVB_type.value != "DVB-S" or not dvbreader_available or self.frontend is None or self.demux < 0:
+		if self.DVB_type.value != "DVB-S" or self.frontend is None or self.demux < 0:
 			return
 
 		adapter = 0
@@ -925,7 +926,9 @@ class ServicesFound(Screen):
 
 
 def SatfinderCallback(close, answer):
+	os.chmod("/usr/lib/enigma2/python/Plugins/SystemPlugins/Satfinder/dvbreader.so", 444)
 	if close and answer:
+
 		close(True)
 
 
@@ -944,10 +947,8 @@ def SatfinderMain(session, close=None, **kwargs):
 	if len(nimList) == 0:
 		session.open(MessageBox, _("No satellite, terrestrial or cable tuner is configured. Please check your tuner setup."), MessageBox.TYPE_ERROR)
 	else:
-		if dvbreader_available:
-			session.openWithCallback(boundFunction(SatfinderCallback, close), SatfinderExtra)
-		else:
-			session.openWithCallback(boundFunction(SatfinderCallback, close), Satfinder)
+		session.openWithCallback(boundFunction(SatfinderCallback, close), SatfinderExtra)
+
 
 
 def SatfinderStart(menuid, **kwargs):
