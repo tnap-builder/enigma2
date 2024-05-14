@@ -683,11 +683,6 @@ int eDVBTerrestrialTransponderData::getSystem() const
 	}
 }
 
-int eDVBTerrestrialTransponderData::getSystems() const
-{
-	return -1;
-}
-
 DEFINE_REF(eDVBATSCTransponderData);
 
 eDVBATSCTransponderData::eDVBATSCTransponderData(struct dtv_property *dtvproperties, unsigned int propertycount, eDVBFrontendParametersATSC &transponderparms, bool original)
