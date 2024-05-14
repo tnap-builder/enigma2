@@ -158,6 +158,10 @@ int eDVBTransponderData::getSystem() const
 	return -1;
 }
 
+int eDVBTransponderData::getSystems() const
+{
+	return -1;
+}
 int eDVBTransponderData::getIsId() const
 {
 	return -1;
