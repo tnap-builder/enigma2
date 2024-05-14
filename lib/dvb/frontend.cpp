@@ -337,7 +337,6 @@ RESULT eDVBFrontendParameters::setDVBT(const eDVBFrontendParametersTerrestrial &
 {
 	terrestrial = p;
 	m_type = iDVBFrontend::feTerrestrial;
-	m_types |= 1 << iDVBFrontend::feTerrestrial;
 	return 0;
 }
 
