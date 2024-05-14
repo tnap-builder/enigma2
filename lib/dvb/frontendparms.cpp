@@ -158,7 +158,15 @@ int eDVBTransponderData::getSystem() const
 	return -1;
 }
 
-int eDVBTransponderData::getSystems() const
+int eDVBTransponderData::getSystems
+
+
+
+
+
+
+
+() const
 {
 	return -1;
 }
@@ -673,6 +681,11 @@ int eDVBTerrestrialTransponderData::getSystem() const
 	case SYS_DVBT: return eDVBFrontendParametersTerrestrial::System_DVB_T;
 	case SYS_DVBT2: return eDVBFrontendParametersTerrestrial::System_DVB_T2;
 	}
+}
+
+int eDVBTerrestrialTransponderData::getSystems() const
+{
+	return -1;
 }
 
 DEFINE_REF(eDVBATSCTransponderData);
