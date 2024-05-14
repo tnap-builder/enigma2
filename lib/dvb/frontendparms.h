@@ -224,6 +224,7 @@ public:
 	int getRolloff() const;
 	int getPilot() const;
 	int getSystem() const;
+	int getSystems() const;
 	int getIsId() const;
 	int getPLSMode() const;
 	int getPLSCode() const;
