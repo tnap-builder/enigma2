@@ -158,6 +158,11 @@ int eDVBTransponderData::getSystem() const
 	return -1;
 }
 
+int eDVBTransponderData::getSystems() const
+{
+	return -1;
+}
+
 int eDVBTransponderData::getIsId() const
 {
 	return -1;
@@ -349,6 +354,11 @@ int eDVBSatelliteTransponderData::getSystem() const
 	case SYS_DVBS: return eDVBFrontendParametersSatellite::System_DVB_S;
 	case SYS_DVBS2: return eDVBFrontendParametersSatellite::System_DVB_S2;
 	}
+}
+
+int eDVBSatelliteTransponderData::getSystems() const
+{
+	return -1;
 }
 
 int eDVBSatelliteTransponderData::getIsId() const
@@ -670,6 +680,11 @@ int eDVBTerrestrialTransponderData::getSystem() const
 	}
 }
 
+int eDVBTerrestrialTransponderData::getSystems() const
+{
+	return -1;
+}
+
 DEFINE_REF(eDVBATSCTransponderData);
 
 eDVBATSCTransponderData::eDVBATSCTransponderData(struct dtv_property *dtvproperties, unsigned int propertycount, eDVBFrontendParametersATSC &transponderparms, bool original)
@@ -730,6 +745,11 @@ int eDVBATSCTransponderData::getSystem() const
 	case SYS_ATSC: return eDVBFrontendParametersATSC::System_ATSC;
 	case SYS_DVBC_ANNEX_B: return eDVBFrontendParametersATSC::System_DVB_C_ANNEX_B;
 	}
+}
+
+int eDVBATSCTransponderData::getSystems() const
+{
+	return -1;
 }
 
 DEFINE_REF(eDVBFrontendData);
