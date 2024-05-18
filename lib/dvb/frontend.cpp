@@ -3320,7 +3320,6 @@ std::string eDVBFrontend::getCapabilities()
 		case SYS_DVBH:		ss << " DVBH"; break;
 		case SYS_DVBS:		ss << " DVBS"; break;
 		case SYS_DVBS2:		ss << " DVBS2"; break;
-		case SYS_DVBT:		ss << " DVBT"; break;
 		case SYS_ISDBC:		ss << " ISDBC"; break;
 		case SYS_ISDBS:		ss << " ISDBS"; break;
 		case SYS_DVBT:		ss << " ISDBT"; break;
