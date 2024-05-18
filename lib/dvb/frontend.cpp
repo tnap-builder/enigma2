@@ -2402,7 +2402,7 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			switch (parm.system)
 			{
 				default:
-				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_ISDBT && SYS_DVBT; break;
+				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_ISDBT; break;
 				case eDVBFrontendParametersTerrestrial::System_DVB_T2: system = SYS_DVBT2; break;
 			}
 
@@ -3063,7 +3063,7 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is
 	{
 		eDVBFrontendParametersTerrestrial parm;
 		bool can_handle_dvbt, can_handle_dvbt2;
-		can_handle_dvbt = supportsDeliverySystem(SYS_DVBT, true);
+		can_handle_dvbt = supportsDeliverySystem(SYS_DVBT, SYS_ISDBT, true);
 		can_handle_dvbt2 = supportsDeliverySystem(SYS_DVBT2, true);
 		if (feparm->getDVBT(parm) < 0)
 		{
