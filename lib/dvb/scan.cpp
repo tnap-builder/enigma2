@@ -351,7 +351,7 @@ RESULT eDVBScan::startFilter()
 			if (m_SDT->start(m_demux, eDVBSDTSpec()))
 				return -1;
 		}
-		else if (m_SDT->start(m_demux, eDVBSDTSpec(tsid, false)))
+		else if (m_SDT->start(m_demux, eDVBSDTSpec(tsid, true)))
 			return -1;
 		CONNECT(m_SDT->tableReady, eDVBScan::SDTready);
 	}
@@ -464,7 +464,7 @@ void eDVBScan::PMTready(int err)
 				case 0x02: // MPEG 2 video
 					isvideo = 1;
 					forced_video = 1;
-					[[fallthrough]];
+					//break; fall through !!!
 				case 0x03: // MPEG 1 audio
 				case 0x04: // MPEG 2 audio
 				case 0x0f: // MPEG 2 AAC
@@ -474,7 +474,6 @@ void eDVBScan::PMTready(int err)
 						forced_audio = 1;
 						isaudio = 1;
 					}
-					[[fallthrough]];
 				case 0x06: // PES Private
 				case 0x81: // user private
 				case 0xEA: // TS_PSI_ST_SMPTE_VC1
@@ -809,7 +808,6 @@ void eDVBScan::channelDone()
 							feparm->setDVBS(p);
 							addChannelToScan(feparm);
 						}
-						[[fallthrough]];
 					}
 					case SATELLITE_DELIVERY_SYSTEM_DESCRIPTOR:
 					{
@@ -1643,7 +1641,7 @@ RESULT eDVBScan::processVCT(eDVBNamespace dvbnamespace, const VirtualChannelTabl
 	return 0;
 }
 
-RESULT eDVBScan::connectEvent(const sigc::slot<void(int)> &event, ePtr<eConnection> &connection)
+RESULT eDVBScan::connectEvent(const sigc::slot1<void,int> &event, ePtr<eConnection> &connection)
 {
 	connection = new eConnection(this, m_event.connect(event));
 	return 0;
