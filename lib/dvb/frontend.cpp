@@ -523,7 +523,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 				*/
 			if (sat.symbol_rate > 20000000)
 				timeout = 5000;
-				eDebug("[eDVBFrontend #525] timeout = 5000");
+				eDebug("[eDVBFrontend%d] opening frontend", m_dvbid);
 			else if (sat.symbol_rate > 10000000)
 				timeout = 10000;
 			else
