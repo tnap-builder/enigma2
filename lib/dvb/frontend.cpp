@@ -1930,7 +1930,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				break;
 			}
 			case eSecCommand::SET_TIMEOUT:
-				m_timeoutCount = (m_sec_sequence.current()++->val) - 1000;
+				m_timeoutCount = (m_sec_sequence.current()++->val) - 6000;
 				eDebugNoSimulate("[eDVBFrontend%d] set timeout %d", m_dvbid, m_timeoutCount);
 				break;
 			case eSecCommand::IF_TIMEOUT_GOTO:
