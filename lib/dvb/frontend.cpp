@@ -522,13 +522,13 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 					zigzag has to find the exact frequency first.
 				*/
 			if (sat.symbol_rate > 20000000)
-				eDebug("[eDVBFrontend#525] sat.symbol_rate = %x, timeout = 5000", sat.symbol_rate);
+				eDebug("[eDVBFrontend#525] sat.symbol_rate >20, timeout = 5000");
 				timeout = 5000;
 			else if (sat.symbol_rate > 10000000)
-				eDebug("[eDVBFrontend#528] sat.symbol_rate = %x, timeout = 10000", sat.symbol_rate);
+				eDebug("[eDVBFrontend#528] sat.symbol_rate > 10, timeout = 10000");
 				timeout = 10000;
 			else
-				eDebug("[eDVBFrontend#531] sat.symbol_rate = %x, timeout = 20000", sat.symbol_rate);
+				eDebug("[eDVBFrontend#531] sat.symbol_rate <  10, timeout = 20000");
 				timeout = 20000;
 			return 0;
 		}
