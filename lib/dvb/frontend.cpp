@@ -514,7 +514,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 	switch (m_type)
 	{
 		case iDVBFrontend::feSatellite:
-		{    
+		{
 				/* high symbol rate transponders tune faster, due to
 					requiring less zigzag and giving more symbols faster.
 
