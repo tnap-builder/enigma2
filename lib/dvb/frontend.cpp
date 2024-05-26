@@ -524,9 +524,9 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 			if (sat.symbol_rate > 20000000)
 			{
 				eDebug("[eDVBFrontend#526] sat.symbol_rate = %d, timeout = 5000", sat.symbol_rate);
-				timeout = 12000;
+				timeout = 5000;
 			}
-			else if (sat.symbol_rate > 10000000)
+			else if (sat.symbol_rate > 2000000)
 			{
 				eDebug("[eDVBFrontend#521] sat.symbol_rate = %d, timeout = 10000", sat.symbol_rate);
 				timeout = 10000;
@@ -1931,7 +1931,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				int tuneTimeout = (m_sec_sequence.current()->timeout)-2000;
+				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
