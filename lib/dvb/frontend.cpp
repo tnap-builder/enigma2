@@ -521,11 +521,9 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 					5s are definitely not enough on really low SR when
 					zigzag has to find the exact frequency first.
 				*/
+			eDebug("[eDVBFrontend%d] opening frontend", m_dvbid);
 			if (sat.symbol_rate > 20000000)
-			{
 				timeout = 5000;
-				eDebug("[eDVBFrontend%d] opening frontend", m_dvbid);
-			}
 			else if (sat.symbol_rate > 10000000)
 				timeout = 10000;
 			else
