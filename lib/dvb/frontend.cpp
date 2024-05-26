@@ -514,14 +514,14 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 	switch (m_type)
 	{
 		case iDVBFrontend::feSatellite:
-		{
+		{    
 				/* high symbol rate transponders tune faster, due to
 					requiring less zigzag and giving more symbols faster.
 
 					5s are definitely not enough on really low SR when
 					zigzag has to find the exact frequency first.
 				*/
-			eDebug("[eDVBFrontend%d] opening frontend", m_dvbid);
+			eDebug("[eDVBFrontend] opening frontend");
 			if (sat.symbol_rate > 20000000)
 				timeout = 5000;
 			else if (sat.symbol_rate > 10000000)
