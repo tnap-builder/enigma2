@@ -1922,7 +1922,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				int tuneTimeout = (m_sec_sequence.current()->timeout)-500;
+				int tuneTimeout = (m_sec_sequence.current()->timeout)-2000;
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
@@ -1930,17 +1930,12 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				break;
 			}
 			case eSecCommand::SET_TIMEOUT:
-				m_timeoutCount = 100;
+				m_timeoutCount = (m_sec_sequence.current()++->val) - 1000;
 				eDebugNoSimulate("[eDVBFrontend%d] set timeout %d", m_dvbid, m_timeoutCount);
 				break;
 			case eSecCommand::IF_TIMEOUT_GOTO:
-				if (!m_timeoutCount)
-				{
-					eDebugNoSimulate("[eDVBFrontend%d] rotor timout", m_dvbid);
-					setSecSequencePos(m_sec_sequence.current()->steps);
-				}
-				else
-					++m_sec_sequence.current();
+				eDebugNoSimulate("[eDVBFrontend%d] rotor timout", m_dvbid);
+				setSecSequencePos(m_sec_sequence.current()->steps);
 				break;
 			case eSecCommand::MEASURE_IDLE_INPUTPOWER:
 			{
@@ -2402,7 +2397,7 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			switch (parm.system)
 			{
 				default:
-				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_DVBT; break;
+				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_ISDBT; break;
 				case eDVBFrontendParametersTerrestrial::System_DVB_T2: system = SYS_DVBT2; break;
 			}
 
