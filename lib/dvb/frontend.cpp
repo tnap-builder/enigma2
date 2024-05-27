@@ -1932,15 +1932,9 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
-				if (FE_HAS_LOCK == 0)
-					eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
+				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
-				if (FE_HAS_LOCK == 1)
-				{
-					m_timeout->start(tuneTimeout, 1);
-					eDebug("[eDVBFrontend%d] --Transponder Not Locked! Aborting Tune!!!", m_dvbid);
-				}
 				++m_sec_sequence.current();
 				break;
 			}
