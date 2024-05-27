@@ -1933,16 +1933,15 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				int unlockstat = (eConfigManager::getConfigBoolValue(show_signal_below_lock));
 				sleep(.3);
 				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
-				if (!m_simulate && lockstat && unlockstat)
+				if (!m_simulate && lockstat)
 					m_timeout->start(tuneTimeout, 1);				
 				else if (tuneTimeout > 2000000)
 				{
-					m_timeout->start(3000, 1);
+					m_timeout->start(60000, 1);
 					eDebug("[eDVBFrontend%d] UNLOCKED TRANSPONDER  Timeout = 3 seconds", m_dvbid);
 				}
 				++m_sec_sequence.current();
