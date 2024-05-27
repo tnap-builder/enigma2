@@ -1408,7 +1408,7 @@ int eDVBFrontend::readFrontendData(int type)
 	sprintf(force_legacy_signal_stats, "config.Nims.%d.force_legacy_signal_stats", m_slotid);
 	char show_signal_below_lock[64] = {};
 	sprintf(show_signal_below_lock, "config.Nims.%d.show_signal_below_lock", m_slotid);
-	char show_signal_below_lock[64] = {};
+	char allow_unlocked_transponder[64] = {};
 	sprintf(allow_unlocked_transponder, "config.Nims.%d.allow_unlocked_transponder", m_slotid);
 
 	switch(type)
