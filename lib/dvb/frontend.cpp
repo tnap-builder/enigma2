@@ -1931,7 +1931,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
+				int isLocked = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
@@ -1986,7 +1986,6 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 					break;
 				}
 				int signal = 0;
-				int isLocked = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				m_idleInputpower[0] = m_idleInputpower[1] = 0;
 				--m_timeoutCount;
 				if (!m_timeoutCount && m_retryCount > 0)
