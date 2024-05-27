@@ -1933,7 +1933,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			{
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
-				if (!m_simulate)
+				if (!m_simulate && m_state == stateLock)
 					m_timeout->start(tuneTimeout, 1);
 				++m_sec_sequence.current();
 				break;
