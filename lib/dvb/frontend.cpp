@@ -1937,7 +1937,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				if (!m_simulate && lockstat)
 					m_timeout->start(tuneTimeout, 1);				
 				else
-					m_timeout->start(tuneTimeout, 1);
+					m_timeout->start(3000, 1);
 				++m_sec_sequence.current();
 				break;
 			}
