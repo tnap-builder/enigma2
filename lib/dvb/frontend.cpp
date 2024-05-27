@@ -521,12 +521,12 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 					5s are definitely not enough on really low SR when
 					zigzag has to find the exact frequency first.
 				*/
-			if (sat.symbol_rate > 20000000)
+			if (sat.symbol_rate >= 20000000)
 			{
 				eDebug("[eDVBFrontend#526] sat.symbol_rate = %d, timeout = 5000", sat.symbol_rate);
 				timeout = 4000;
 			}
-			else if (sat.symbol_rate > 2000000)
+			else if (sat.symbol_rate >= 2000000 && sat.symbol_rate < 20000000)
 			{
 				eDebug("[eDVBFrontend#521] sat.symbol_rate = %d, timeout = 10000", sat.symbol_rate);
 				timeout = 10000;
@@ -534,7 +534,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 			else
 			{
 				eDebug("[eDVBFrontend#536] sat.symbol_rate = %d, timeout = 20000", sat.symbol_rate);
-				timeout = 20000;
+				timeout = 40000;
 			}
 			return 0;
 		}
@@ -1933,7 +1933,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				sleep(.3); //below
+				sleep(.3); // below
 				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
