@@ -1939,7 +1939,9 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate && lockstat)
 					m_timeout->start(tuneTimeout, 1);				
-				else if (tuneTimeout > 2000000)
+				else if (eConfigManager::getConfigBoolValue(allow_unlocked_transponder, true))
+					m_timeout->start(60000, 1);
+				else
 				{
 					m_timeout->start(3000, 1);
 					eDebug("[eDVBFrontend%d] UNLOCKED TRANSPONDER  Timeout = 3 seconds", m_dvbid);
