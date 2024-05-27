@@ -1934,7 +1934,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				if (lockstat)
 					int tuneTimeout = (m_sec_sequence.current()->timeout);
-				if (!lockstat)
+				else
 					int tuneTimeout = 3000;
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
