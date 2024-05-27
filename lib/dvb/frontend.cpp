@@ -521,7 +521,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 					5s are definitely not enough on really low SR when
 					zigzag has to find the exact frequency first.
 				*/
-			if (sat.symbol_rate > 20000000 && event.status & FE_HAS_LOCK)
+			if (event.status & FE_HAS_LOCK)
 			{
 				eDebug("[eDVBFrontend#526] sat.symbol_rate = %d, timeout = 5000", sat.symbol_rate);
 				timeout = 5000;
