@@ -1936,7 +1936,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 					eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
-				else
+				if (FE_HAS_LOCK == 1)
 				{
 					m_timeout->start(tuneTimeout, 1);
 					eDebug("[eDVBFrontend%d] --Transponder Not Locked! Aborting Tune!!!", m_dvbid);
