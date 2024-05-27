@@ -1931,10 +1931,8 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				if (m_state == stateLock)
-					int tuneTimeout = (m_sec_sequence.current()->timeout);
-				if (!m_state == stateLock)
-					int tuneTimeout = (m_sec_sequence.current()->timeout);
+
+				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate)
 					m_timeout->start(tuneTimeout, 1);
