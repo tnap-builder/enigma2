@@ -1933,7 +1933,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			}
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
-				if (eConfigManager::getConfigBoolValue(allow_unlocked_transponder, true))
+				if (eConfigManager::getConfigBoolValue(show_signal_below_lock, true))
 					sleep(.3);
 				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
