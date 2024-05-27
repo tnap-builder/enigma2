@@ -521,7 +521,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 					5s are definitely not enough on really low SR when
 					zigzag has to find the exact frequency first.
 				*/
-			if (sat.symbol_rate > 20000000)
+			if (sat.symbol_rate > 20000000 & FE_HAS_LOCK)
 			{
 				eDebug("[eDVBFrontend#526] sat.symbol_rate = %d, timeout = 5000", sat.symbol_rate);
 				timeout = 5000;
@@ -550,7 +550,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 		}
 		case iDVBFrontend::feATSC:
 		{
-			timeout = 5000;
+			timeout = 3000;
 			return 0;
 		}
 		default:
@@ -862,11 +862,11 @@ void eDVBFrontend::feEvent(int w)
 		if (event.status & FE_HAS_LOCK)
 		{
 			state = stateLock;
-			eDebug("[eDVB-#856-Frontend%d] fe event: Has Lock!!!", m_dvbid);
+			eDebug("[eDVB-#865-Frontend%d] fe event: Has Lock!!!", m_dvbid);
 		}
 		else
 		{
-			eDebug("[eDVB-#860-Frontend%d] fe event: Not Locked!!!", m_dvbid);
+			eDebug("[eDVB-#869-Frontend%d] fe event: Not Locked!!!", m_dvbid);
 			if (m_tuning) {
 				state = stateTuning;
 				if (event.status & FE_TIMEDOUT) {
