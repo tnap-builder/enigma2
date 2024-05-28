@@ -1787,6 +1787,7 @@ def InitNimManager(nimmgr, update_slots=[]):
 		nim = config.Nims[slot_id]
 		nim.force_legacy_signal_stats = ConfigYesNo(default=False)
 		nim.show_signal_below_lock = ConfigYesNo(default=False)
+		nim.allow_unlocked_transponder = ConfigYesNo(default=True)
 
 		if slot.isCombined():
 			nim.configModeDVBS = ConfigYesNo()
