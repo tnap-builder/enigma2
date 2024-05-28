@@ -1935,13 +1935,17 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				sleep(.3); // below
 				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
+				int allowunlock = (eConfigManager::getConfigBoolValue(allow_unlocked_transponder, true))
 				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d, lockstat =  %d", m_dvbid, tuneTimeout, lockstat);
-				if (!m_simulate && lockstat)
-					m_timeout->start(tuneTimeout, 1);				
-				if (eConfigManager::getConfigBoolValue(allow_unlocked_transponder, true))
+				if (!m_simulate && allowunlock == 1)
 				{
-					m_timeout->start((tuneTimeout - 4000), 1);
-					eDebug("[eDVBFrontend%d] UNLOCKED TRANSPONDER  Timeout = %d, lockstat =  %d", m_dvbid, (tuneTimeout - 4000), lockstat);
+					m_timeout->start(tuneTimeout, 1);				
+					eDebug("[eDVBFrontend%d] allowunlock == 1  Timeout = %d, lockstat =  %d allowunlock = %d", m_dvbid, (tuneTimeout - 4000), lockstat, allowunlock);
+				}
+				if (!m_simulate && lockstat == 0 && allowunlock == 0)
+				{
+					m_timeout->start((4000), 1);
+					eDebug("[eDVBFrontend%d] UNLOCKED TRANSPONDER  Timeout = %d, lockstat =  %d allowunlock = %d" , m_dvbid, (tuneTimeout - 4000), lockstat, allowunlock);
 				}
 				++m_sec_sequence.current();
 				break;
