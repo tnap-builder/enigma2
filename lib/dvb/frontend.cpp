@@ -1947,9 +1947,14 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 					m_timeout->start((3000), 1);
 					eDebug("[eDVBFrontend%d] UNLOCKED TRANSPONDER  Timeout = %d, lockstat =  %d allowunlock = %d" , m_dvbid, tuneTimeout, lockstat, allowunlock);
 				}
-				if (!m_simulate && allowunlock == 1)
+				if (!m_simulate && allowunlock == 1 && lockstat == 0)
 				{
 					m_timeout->start(tuneTimeout, 1);				
+					eDebug("[eDVBFrontend%d] allowunlock == 1  Timeout = %d, lockstat =  %d allowunlock = %d", m_dvbid, tuneTimeout, lockstat, allowunlock);
+				}
+				if (!m_simulate && allowunlock == 1 && lockstat == 1)
+				{
+					m_timeout->start(tuneTimeout, 1);
 					eDebug("[eDVBFrontend%d] allowunlock == 1  Timeout = %d, lockstat =  %d allowunlock = %d", m_dvbid, tuneTimeout, lockstat, allowunlock);
 				}
 				++m_sec_sequence.current();
