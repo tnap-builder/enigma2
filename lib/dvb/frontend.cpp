@@ -526,7 +526,7 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 				eDebug("[eDVBFrontend#526] sat.symbol_rate = %d, timeout = 5000", sat.symbol_rate);
 				timeout = 4000;
 			}
-			else if (sat.symbol_rate >= 2000000 && sat.symbol_rate < 20000000)
+			else if (sat.symbol_rate >= 2000000 && sat.symbol_rate <= 19999999)
 			{
 				eDebug("[eDVBFrontend#521] sat.symbol_rate = %d, timeout = 10000", sat.symbol_rate);
 				timeout = 10000;
