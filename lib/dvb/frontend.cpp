@@ -1936,11 +1936,12 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 			case eSecCommand::START_TUNE_TIMEOUT:
 			{
 				char allow_unlocked_transponder[64] = {};
-				sprintf(allow_unlocked_transponder, "config.Nims.%d.allow_unlocked_transponder", m_slotid);
+				sprintf(allow_unlocked_transponder, "config.allow_unlocked_transponder");
 				sleep(.3); // below
 				int lockstat = readFrontendData(iFrontendInformation_ENUMS::lockState);
 				int tuneTimeout = (m_sec_sequence.current()->timeout);
 				int allowunlock = (eConfigManager::getConfigBoolValue(allow_unlocked_transponder));
+				eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 				if (!m_simulate && allowunlock == 0 && lockstat == 0)
 				{
 					tuneTimeout = 0;
@@ -1949,19 +1950,16 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				}
 				if (!m_simulate && allowunlock == 1 && lockstat == 0)
 				{
-					eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 					m_timeout->start(tuneTimeout, 1);				
 					eDebug("[eDVBFrontend%d] lockstat == 0  Timeout = %d, lockstat =  %d allowunlock = %d", m_dvbid, tuneTimeout, lockstat, allowunlock);
 				}
 				if (!m_simulate && allowunlock == 1 && lockstat == 1)
 				{
-					eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 					m_timeout->start(tuneTimeout, 1);
 					eDebug("[eDVBFrontend%d] lockstat == 1  Timeout = %d, lockstat =  %d allowunlock = %d", m_dvbid, tuneTimeout, lockstat, allowunlock);
 				}
 				if (!m_simulate && allowunlock == 0 && lockstat == 1)
 				{
-					eDebugNoSimulate("[eDVBFrontend%d] startTuneTimeout %d", m_dvbid, tuneTimeout);
 					m_timeout->start(tuneTimeout, 1);
 					eDebug("[eDVBFrontend%d] lockstat == 1  Timeout = %d, lockstat =  %d allowunlock = %d", m_dvbid, tuneTimeout, lockstat, allowunlock);
 				}
