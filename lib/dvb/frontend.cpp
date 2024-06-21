@@ -2436,8 +2436,8 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			switch (parm.system)
 			{
 				default:
-				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_ISDBT; break;
-				case eDVBFrontendParametersTerrestrial::System_DVB_T2: system = SYS_ISDBT; break;
+				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_DVBT; break;
+				case eDVBFrontendParametersTerrestrial::System_DVB_T2: system = SYS_DVBT2; break;
 			}
 
 			p[cmdseq.num].cmd = DTV_DELIVERY_SYSTEM, p[cmdseq.num].u.data = system, cmdseq.num++;
@@ -3097,8 +3097,8 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is
 	{
 		eDVBFrontendParametersTerrestrial parm;
 		bool can_handle_dvbt, can_handle_dvbt2;
-		can_handle_dvbt = supportsDeliverySystem(SYS_ISDBT, true);
-		can_handle_dvbt2 = supportsDeliverySystem(SYS_ISDBT, true);
+		can_handle_dvbt = supportsDeliverySystem(SYS_DVBT, true);
+		can_handle_dvbt2 = supportsDeliverySystem(SYS_DVBT2, true);
 		if (feparm->getDVBT(parm) < 0)
 		{
 			return 0;
@@ -3354,7 +3354,7 @@ std::string eDVBFrontend::getCapabilities()
 		case SYS_DVBH:		ss << " DVBH"; break;
 		case SYS_DVBS:		ss << " DVBS"; break;
 		case SYS_DVBS2:		ss << " DVBS2"; break;
-		case SYS_DVBT:		ss << " ISDBT"; break;
+		case SYS_DVBT:		ss << " DVBT"; break;
 		case SYS_ISDBC:		ss << " ISDBC"; break;
 		case SYS_ISDBS:		ss << " ISDBS"; break;
 		case SYS_ISDBT:		ss << " ISDBT"; break;
