@@ -288,6 +288,7 @@ int eDVBSatelliteTransponderData::getFecInner() const
 	switch (getProperty(DTV_INNER_FEC))
 	{
 	case FEC_1_2: return eDVBFrontendParametersSatellite::FEC_1_2;
+	case FEC_1_4: return eDVBFrontendParametersSatellite::FEC_1_4;
 	case FEC_2_3: return eDVBFrontendParametersSatellite::FEC_2_3;
 	case FEC_3_4: return eDVBFrontendParametersSatellite::FEC_3_4;
 	case FEC_3_5: return eDVBFrontendParametersSatellite::FEC_3_5;
