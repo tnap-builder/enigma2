@@ -298,7 +298,7 @@ int eDVBSatelliteTransponderData::getFecInner() const
 	case FEC_8_9: return eDVBFrontendParametersSatellite::FEC_8_9;
 	case FEC_9_10: return eDVBFrontendParametersSatellite::FEC_9_10;
 	case FEC_NONE: return eDVBFrontendParametersSatellite::FEC_None;
-	default: eDebug("[eDVBSatelliteTransponderData] got unsupported FEC from frontend! report as FEC_AUTO!\n");
+	default: eDebug("[eDVBSatelliteTransponderData] got unsupported FEC from frontend! report as FEC_AUTO!\n %d", (getProperty(DTV_INNER_FEC)));
 	[[fallthrough]];
 	case FEC_AUTO: return eDVBFrontendParametersSatellite::FEC_Auto;
 	}
