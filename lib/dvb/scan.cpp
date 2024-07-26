@@ -1049,7 +1049,7 @@ void eDVBScan::channelDone()
 	}
 
 	if (!m_chid_current)
-		eWarning("[scan.cpp-#1025] the current channel's ID was not corrected - not adding channel %s", m_ch_current);
+		eWarning("[scan.cpp-#1025] the current channel's ID was not corrected - not adding channel %s", (m_ch_current));
 	else
 	{
 		addKnownGoodChannel(m_chid_current, m_ch_current);
