@@ -283,7 +283,7 @@ int eDVBSatelliteTransponderData::getOrbitalPosition() const
 
 int eDVBSatelliteTransponderData::getFecInner() const
 {
-	default: eDebug("[eDVBSatelliteTransponderData] got FEC from frontend! report as FEC_AUTO!\n %d", (getProperty(DTV_INNER_FEC)));
+	eDebug("[eDVBSatelliteTransponderData] got FEC from frontend! report as FEC_AUTO!\n %d", (getProperty(DTV_INNER_FEC)));
 	if (originalValues) return transponderParameters.fec;
 
 	switch (getProperty(DTV_INNER_FEC))
