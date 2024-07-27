@@ -289,6 +289,7 @@ int eDVBSatelliteTransponderData::getFecInner() const
 
 	switch (getProperty(DTV_INNER_FEC))
 	{
+	case FEC_1_4: eDebug("[eDVBSatelliteTransponderData] got unsupported FEC from frontend 1/4!");		
 	case FEC_1_2: return eDVBFrontendParametersSatellite::FEC_1_2;
 	case FEC_2_3: return eDVBFrontendParametersSatellite::FEC_2_3;
 	case FEC_3_4: return eDVBFrontendParametersSatellite::FEC_3_4;
