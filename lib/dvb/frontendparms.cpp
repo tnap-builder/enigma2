@@ -264,7 +264,6 @@ int eDVBSatelliteTransponderData::getInversion() const
 
 unsigned int eDVBSatelliteTransponderData::getFrequency() const
 {
-	eDebug("[eDVBSatelliteTransponderData] got FREQUENCY from frontend! %d %d", (originalValues), (getProperty(DTV_FREQUENCY)));
 	if (originalValues) return transponderParameters.frequency;
 
 	return getProperty(DTV_FREQUENCY) + frequencyOffset;
@@ -284,7 +283,6 @@ int eDVBSatelliteTransponderData::getOrbitalPosition() const
 
 int eDVBSatelliteTransponderData::getFecInner() const
 {
-	eDebug("[eDVBSatelliteTransponderData] got FEC from frontend! %d %d", (originalValues), (getProperty(DTV_INNER_FEC)));
 	if (originalValues) return transponderParameters.fec;
 
 	switch (getProperty(DTV_INNER_FEC))
