@@ -2431,7 +2431,7 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 		else if (type == iDVBFrontend::feTerrestrial)
 		{
 			eDVBFrontendParametersTerrestrial parm{};
-			fe_delivery_system_t system = SYS_DVBT, SYS_ISDBT;
+			fe_delivery_system_t system = SYS_DVBT;
 			oparm.getDVBT(parm);
 			switch (parm.system)
 			{
