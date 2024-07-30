@@ -825,7 +825,7 @@ void eDVBDB::saveServicelist(const char *file)
 					sat.orbital_position > 1800 ? sat.orbital_position - 3600 : sat.orbital_position,
 					sat.inversion, flags);
 
-			if if ((sat.system == eDVBFrontendParametersSatellite::System_DVB_S2) || (sat.system == eDVBFrontendParametersSatellite::System_DVB_S2X))
+			if (sat.system == eDVBFrontendParametersSatellite::System_DVB_S2)
 			{
 				fprintf(f, ":%d:%d:%d:%d", sat.system, sat.modulation, sat.rolloff, sat.pilot);
 				if (g)
