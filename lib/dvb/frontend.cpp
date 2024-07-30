@@ -2435,6 +2435,7 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			oparm.getDVBT(parm);
 			switch (parm.system)
 			{
++				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_ISDBT; break;
 				default:
 				case eDVBFrontendParametersTerrestrial::System_DVB_T: system = SYS_DVBT; break;
 				case eDVBFrontendParametersTerrestrial::System_DVB_T2: system = SYS_DVBT2; break;
