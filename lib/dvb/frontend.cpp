@@ -3098,9 +3098,14 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is
 	{
 		eDVBFrontendParametersTerrestrial parm;
 		bool can_handle_dvbt, can_handle_dvbt2, can_handle_isdbt;
+		can_handle_dvbt = supportsDeliverySystem(SYS_ISDBT, true);
 		can_handle_dvbt = supportsDeliverySystem(SYS_DVBT, true);
 		can_handle_dvbt2 = supportsDeliverySystem(SYS_DVBT2, true);
 		if (feparm->getDVBT(parm) < 0)
+		{
+			return 0;
+		}
+		if (parm.system == eDVBFrontendParametersTerrestrial::System_DVB_T && can_handle_isdbt)
 		{
 			return 0;
 		}
