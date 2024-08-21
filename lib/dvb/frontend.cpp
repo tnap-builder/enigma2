@@ -1636,6 +1636,8 @@ int eDVBFrontend::readFrontendData(int type)
 			fe_status_t status;
 			if (!m_simulate)
 			{
+				if ( ioctl(m_fd, FE_READ_STATUS, &status) < 0 && errno == ERANGE ) // Silenced this warning for TBS 5925 Should be != ERANGE
+					eDebug("[eDVBFrontend] FE_READ_STATUS failed: %m");
 				return (int)status;
 			}
 			return (FE_HAS_SYNC | FE_HAS_LOCK);
